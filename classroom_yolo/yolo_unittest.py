@@ -45,7 +45,7 @@ def yolo_unittest(cam_url):
     		camera.release()
     		#cv2.destroyAllWindows()
     		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ "HUMAN PRESENCE:" + str(HD)
-    		#variables_hd.cam_url_hd[self.threadid] = HD
+    		#variables_hd.hd_zone[self.threadid] = HD
     		return HD
 
     	if hnd_count < conf["no_of_HNDS"]:
@@ -57,7 +57,7 @@ def yolo_unittest(cam_url):
             #cv2.destroyAllWindows()
             print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+ "Human Presence:" + str(HD)
             return HD
-            #variables_hd.cam_url_hd[self.threadid] = HD
+            #variables_hd.hd_zone[self.threadid] = HD
 
 
     	if conf["show_result"]:

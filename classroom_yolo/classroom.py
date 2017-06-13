@@ -10,6 +10,8 @@ from workerprocess_class import WorkerProcess
 from  hd_variables import variables_hd
 def main():
     print "Starting...."
+
+    variables_hd.mutex = Lock()
     conf = json.load(open("config_main.json"))
 
     pr1_ip, pr1_port, pr2_ip, pr2_port = connect_to_database(conf)
@@ -30,7 +32,7 @@ def main():
     pool = []
 
     #help:def __init__(self, data_id, cam_urls, port, pr1_ip, pr1_port, pr2_ip ,pr2_port):
-    pool.append(WorkerProcess(data_id, port_no, cam_urls, pr1_ip, pr1_port, pr2_ip, pr2_port))
+    pool.append(WorkerProcess(roomno,data_id, port_no, cam_urls, pr1_ip, pr1_port, pr2_ip, pr2_port))
 
     # Start all process
     for process in pool:

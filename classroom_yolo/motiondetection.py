@@ -7,19 +7,26 @@ import threading
 from hd_variables import variables_hd
 from facedetection import face_detection
 from datetime import datetime
+from workerprocess_class import *
 
-class run_yolo(threading.Thread):
+class motiondetection(threading.Thread):
 
-	def __init__(self,cam_url,threadid):
+	def __init__(self,roomno,cam_url,threadid):
 		threading.Thread.__init__(self)
 		self.threadid = threadid
 		self.cam_url = cam_url
-
+		self.roomno = roomno
 
 	def run(self):
 		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Starting Motion Detection for Camera " + str(self.threadid+1)
-		HD=False
 		conf = json.load(open('config_imageprocessing.json'))
+		conf_zones = json.load(open('config_zones.json'))
+
+		zone_info = conf_zones[self.roomno]["cameras"]
+		for keys in zone_info.keys():
+			if str(self.threadid) in keys :
+				zone_no=keys
+
 		HD_Timer =0
 		ThresholdArea = conf["Threshold Area"]
 
@@ -45,6 +52,9 @@ class run_yolo(threading.Thread):
 
 		# loop over the frames of the video
 		while True:
+
+			if variables_hd.decision[zone_no] == True:
+				return
 
 			(grabbed, frame) = camera.read()
 
@@ -95,18 +105,27 @@ class run_yolo(threading.Thread):
 				HD_Timer += 1
 				if HD_Timer  > 25:
 					#print HD_Timer
-					HD = True
 					camera.release()
 					#cv2.destroyAllWindows()
-					print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + str(no_of_contours) +  ", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(HD)
-					variables_hd.cam_url_hd[self.threadid] = HD
+					print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" +
+					str(no_of_contours) +  ", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(variables_hd.hd_zone[self.threadid])
+
+					variables_hd.mutex.acquire()
+					variables_hd.Decision[zone_no] = True;
+					send_HD(zone_no)
+					variables_hd.mutex.release()
+					variables_hd.hd_zone[zone_no] = True
 					return
 
 			#else:
 				#HD_Timer = 0
 
 			if HD_Timer>25:
-				HD = True
+				variables_hd.mutex.acquire()
+				variables_hd.Decision[zone_no] = True;
+				send_HD(zone_no)
+				variables_hd.mutex.release()
+				variables_hd.hd_zone[self.threadid] = True
 				#filename = "/home/stark/BA/Malvika/Presence/" + str(time.strftime("%H %M %S")) + "_" +  str(int(max_contour_area)) + ".jpg"
 				#print filename
 				#cv2.imwrite(filename,frame)
@@ -120,9 +139,10 @@ class run_yolo(threading.Thread):
 
 		camera.release()
 		#cv2.destroyAllWindows()
-		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + str(no_of_contours) +  ", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(HD)
+		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + str(no_of_contours) +
+		", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(variables_hd.hd_zone[self.threadid])
 
-		variables_hd.cam_url_hd[self.threadid] = HD
+		variables_hd.hd_zone[self.threadid] = False
 		return
 
 
