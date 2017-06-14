@@ -7,6 +7,7 @@ import json
 import sys
 from helper_functions import connect_to_database
 from workerprocess_class import WorkerProcess
+from threading import Lock
 from  hd_variables import variables_hd
 def main():
     print "Starting...."

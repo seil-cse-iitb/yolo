@@ -6,7 +6,7 @@ import threading
 from hd_variables import variables_hd
 from datetime import datetime
 import subprocess
-from workerprocess_class import
+from workerprocess_class import *
 
 class run_yolo(threading.Thread):
 
@@ -76,7 +76,7 @@ class run_yolo(threading.Thread):
 
 
 			if conf["show_result"]:
-				cv2.imread(conf["img_result",frame)
+				cv2.imread(conf["img_result"],frame)
 				cv2.imshow("Human Presence", frame)
 
 			#key = cv2.waitKey(1) & 0xFF

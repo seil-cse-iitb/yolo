@@ -4,5 +4,5 @@ class variables_hd():
     mutex = 0
     
     for i in range(2):
-        decision[i] = Lock()
-        hd_zone.append(False)
+		decision.append(False)
+		hd_zone.append(False)

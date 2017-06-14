@@ -5,7 +5,6 @@ import cv2
 import json
 import threading
 from hd_variables import variables_hd
-from facedetection import face_detection
 from datetime import datetime
 from workerprocess_class import *
 
@@ -107,7 +106,7 @@ class motiondetection(threading.Thread):
 					#print HD_Timer
 					camera.release()
 					#cv2.destroyAllWindows()
-					print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" +
+					print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + \
 					str(no_of_contours) +  ", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(variables_hd.hd_zone[self.threadid])
 
 					variables_hd.mutex.acquire()
@@ -139,7 +138,7 @@ class motiondetection(threading.Thread):
 
 		camera.release()
 		#cv2.destroyAllWindows()
-		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + str(no_of_contours) +
+		print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Camera "+ str(self.threadid+1) + ": max_contour_size:" +  str(max_contour_area) + ", no_of_contours:" + str(no_of_contours) + \
 		", HD Timer:" + str(HD_Timer) + ", MOTION:" + str(variables_hd.hd_zone[self.threadid])
 
 		variables_hd.hd_zone[self.threadid] = False

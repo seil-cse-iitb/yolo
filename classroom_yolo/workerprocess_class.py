@@ -5,15 +5,13 @@ import time
 import cv2
 import json
 from runyolo import run_yolo
-from facedetection import face_detection
 from networkLayer import msg_recived,msg_send,createSocket
 from hd_variables import variables_hd
 from datetime import datetime
-from motiondetection import motion_detection
+from motiondetection import motiondetection
 
 
 class WorkerProcess(multiprocessing.Process):
-
     def __init__(self, roomno,data_id, port, cam_urls, pr1_ip, pr1_port, pr2_ip ,pr2_port):
 
         conf= json.load(open('config_imageprocessing.json'))
@@ -37,7 +35,7 @@ class WorkerProcess(multiprocessing.Process):
         for i in range(no_of_zones):
             HD_zones.append(False)
 
-        cycle = Event()
+
         msg_recv = ""
         #zonalcheck = conf["zonalcheck"]
         checkafterHND = conf["checkafterHND"]
@@ -70,7 +68,7 @@ class WorkerProcess(multiprocessing.Process):
         time.sleep(1)
 
     def run(self):
-
+        cycle = Event()
         cycle.clear()
         t1 = Thread(target = state_control)
         t1.start()
@@ -112,7 +110,7 @@ class WorkerProcess(multiprocessing.Process):
                     t.join()
 
 
-                for (i in range(len(no_of_zones))):
+                for i in range(len(no_of_zones)):
                     if variables_hd.decision[i] == False:
                         send_HND(i)
                     variables_hd.decision[i] = False
