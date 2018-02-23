@@ -12,12 +12,16 @@ from motiondetection import motiondetection
 
 
 class WorkerProcess(multiprocessing.Process):
+    
+    
+
     def __init__(self, roomno,data_id, port, cam_urls, pr1_ip, pr1_port, pr2_ip ,pr2_port):
 
         conf= json.load(open('config_imageprocessing.json'))
         conf_zonal = json.load(open('config_zones.json'))
         super(WorkerProcess, self).__init__()
         roomno = roomno
+        cycle = Event()
         port=port
         data_id = data_id
         no_of_zones = conf_zonal[data_id]["no_of_zones"]
@@ -67,15 +71,35 @@ class WorkerProcess(multiprocessing.Process):
         print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" Zone " + str(zone_no+1) + ":" + str(HD_zones[zone_no])
         time.sleep(1)
 
+
+    def state_control(self):
+
+        while True:
+
+            msg_recv = msg_recived()
+
+            if msg_recv[0] == "#" and msg_recv[-1] == ";":
+                temp = msg_recv[1:-1].split(",")
+
+                if temp[1] == "Init":
+                    cycle.clear()
+                    print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" INIT MESSAGE RECEIVED"
+
+                elif temp[1] == "T":
+                    cycle.set()
+                    print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" PIR TRUE RECEIVED"
+                    checkafterHND = conf["checkafterHND"]
+
+
     def run(self):
-        cycle = Event()
-        cycle.clear()
-        t1 = Thread(target = state_control)
+
+        WorkerProcess.cycle.clear()
+        t1 = Thread(target = self.state_control)
         t1.start()
 
         while True:
 
-            cycle.wait()
+            WorkerProcess.cycle.wait()
             data = msg_recv
 
             if not HD_overall:
@@ -130,22 +154,5 @@ class WorkerProcess(multiprocessing.Process):
                         continue
 
                     else:
-                        cycle.clear()
+                        WorkerProcess.cycle.clear()
 
-    def state_control(self):
-
-        while True:
-
-            msg_recv = msg_recived()
-
-            if msg_recv[0] == "#" and msg_recv[-1] == ";":
-                temp = msg_recv[1:-1].split(",")
-
-                if temp[1] == "Init":
-                    cycle.clear()
-                    print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" INIT MESSAGE RECEIVED"
-
-                elif temp[1] == "T":
-                    cycle.set()
-                    print datetime.now().strftime('[%d-%b-%y %H:%M:%S]')+" PIR TRUE RECEIVED"
-                    checkafterHND = conf["checkafterHND"]
